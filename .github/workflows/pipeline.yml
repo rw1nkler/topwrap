@@ -96,3 +96,27 @@ jobs:
         with:
           name: core_repo
           path: core_repo/**
+  
+  package_dist:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:bookworm
+    name: "Package source distribution"
+
+    steps:
+      - name: Install git package
+        run: |
+          apt-get update -qq
+          apt-get install -y git
+
+      - uses: actions/checkout@v4
+
+      - name: Build distribution packages
+        run: |
+          ./.github/scripts/ci.sh package_dist
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/**

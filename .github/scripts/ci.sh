@@ -159,6 +159,19 @@ package_cores() {
     end_command_group
 }
 
+package_dist() {
+    install_common_system_packages
+    enter_venv
+
+    begin_command_group "Install python packages needed for build"
+    log_cmd pip install ".[deploy]"
+    end_command_group
+
+    begin_command_group "Build packages"
+    log_cmd nox -s build
+    end_command_group
+}
+
 case "$1" in
 lint)
     run_lint
@@ -172,7 +185,10 @@ examples)
 package_cores)
     package_cores
     ;;
+package_dist)
+    package_dist
+    ;;
 *)
-    echo "Usage: $0 {lint|tests|examples|package_cores}"
+    echo "Usage: $0 {lint|tests|examples|package_cores|package_dist}"
     ;;
 esac
