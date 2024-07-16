@@ -95,3 +95,18 @@ def tests_in_env(session: nox.Session) -> None:
 def build(session: nox.Session) -> None:
     session.install("-e", ".[deploy]")
     session.run("python3", "-m", "build")
+
+@nox.session
+def build_and_install_and_test(session: nox.Session) -> None:
+    build(session)
+    session.notify("__install_and_test")
+
+@nox.session(default=False)
+def __install_and_test(session: nox.Session) -> None:
+    session.install("./dist/topwrap-0.0.1.tar.gz")
+    tmpdir = session.create_tmp()
+    session.run("cp", "-r", "tests", "examples", tmpdir)
+    session.run("mkdir", os.path.join(tmpdir, "topwrap"))
+    session.run("cp", "-r", "topwrap/ips", os.path.join(tmpdir, "topwrap/"))
+    session.chdir(tmpdir)
+    session.run("pytest", "-rs", "--cov-report", "html:cov_html", "--cov=topwrap", "tests")
