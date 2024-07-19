@@ -96,20 +96,27 @@ def tests_in_env(session: nox.Session) -> None:
 def build(session: nox.Session) -> None:
     session.install("-e", ".[deploy]")
     session.run("python3", "-m", "build")
+    if len(session.posargs) < 1 or session.posargs[0] != "--no-test":
+        session.notify("_install_test")
 
 
+# this exists separately in order to have a fresh venv without topwrap installed in development mode
 @nox.session
-def build_and_install_and_test(session: nox.Session) -> None:
-    build(session)
-    session.notify("__install_and_test")
+def _install_test(session: nox.Session) -> None:
+    package_file = None
+    for f in os.listdir("./dist"):
+        if f.startswith("topwrap") and f.endswith("tar.gz"):
+            package_file = f
+            break
 
+    assert package_file is not None, "Cannot find source package in the dist/ directory"
+    session.install(f"./dist/{package_file}[tests,topwrap-parse]")
 
-@nox.session(default=False)
-def __install_and_test(session: nox.Session) -> None:
-    session.install("./dist/topwrap-0.0.1.tar.gz")
-    tmpdir = session.create_tmp()
-    session.run("cp", "-r", "tests", "examples", tmpdir)
-    session.run("mkdir", os.path.join(tmpdir, "topwrap"))
-    session.run("cp", "-r", "topwrap/ips", os.path.join(tmpdir, "topwrap/"))
-    session.chdir(tmpdir)
-    session.run("pytest", "-rs", "--cov-report", "html:cov_html", "--cov=topwrap", "tests")
+    # paranoid assurance to not accidentally test local source
+    CHANGED_NAME = "./shadow_topwrap"
+    session.run("mv", "./topwrap", CHANGED_NAME, external=True)
+    try:
+        # --import-mode=append won't work without refactoring tests directory (adding __init__.py files and using relative imports)
+        session.run("pytest", "-rs", "--cov-report", "html:cov_html", "--cov=topwrap", "tests")
+    finally:
+        session.run("mv", CHANGED_NAME, "./topwrap", external=True)
