@@ -161,11 +161,35 @@ package_cores() {
 
 package_dist() {
     install_common_system_packages
+
+    begin_command_group "Install system packages for tests"
+    log_cmd apt-get install -y --no-install-recommends \
+        curl \
+        wget \
+        python3-dev \
+        make \
+        meson \
+        ninja-build \
+        gcc-riscv64-unknown-elf \
+        bsdextrautils \
+        verilator \
+        libssl-dev \
+        libreadline-dev \
+        libffi-dev \
+        libbz2-dev \
+        libncurses-dev \
+        libsqlite3-dev \
+        liblzma-dev
+    end_command_group
+
     enter_venv
 
-    begin_command_group "Install python packages needed for build"
-    log_cmd pip install ".[deploy]"
+    begin_command_group "Install python packages needed for building and testing"
+    log_cmd pip install ".[deploy,tests]"
+    log_cmd pip install git+https://github.com/antmicro/tuttest
     end_command_group
+
+    install_topwrap
 
     begin_command_group "Build packages"
     log_cmd nox -s build
