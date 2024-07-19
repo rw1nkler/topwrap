@@ -91,15 +91,18 @@ def tests_in_env(session: nox.Session) -> None:
     env = prepare_pyenv(session)
     session.run("nox", "-s", "tests", external=True, env=env)
 
+
 @nox.session
 def build(session: nox.Session) -> None:
     session.install("-e", ".[deploy]")
     session.run("python3", "-m", "build")
 
+
 @nox.session
 def build_and_install_and_test(session: nox.Session) -> None:
     build(session)
     session.notify("__install_and_test")
+
 
 @nox.session(default=False)
 def __install_and_test(session: nox.Session) -> None:
