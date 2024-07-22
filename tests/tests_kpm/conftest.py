@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
-from common import read_json_file
 from yaml import Loader, load
+
+from .common import read_json_file
 
 
 @pytest.fixture

@@ -106,12 +106,12 @@ def _install_test(session: nox.Session) -> None:
     package_file = next(Path().glob("dist/topwrap*.tar.gz"), None)
     assert package_file is not None, "Cannot find source package in the dist/ directory"
     session.install(f"{package_file}[tests,topwrap-parse]")
-
-    # paranoid assurance to not accidentally test local source
-    CHANGED_NAME = "./shadow_topwrap"
-    session.run("mv", "./topwrap", CHANGED_NAME, external=True)
-    try:
-        # --import-mode=append won't work without refactoring tests directory (adding __init__.py files and using relative imports)
-        session.run("pytest", "-rs", "--cov-report", "html:cov_html", "--cov=topwrap", "tests")
-    finally:
-        session.run("mv", CHANGED_NAME, "./topwrap", external=True)
+    session.run(
+        "pytest",
+        "-rs",
+        "--cov-report",
+        "html:cov_html",
+        "--cov=topwrap",
+        "--import-mode=append",
+        "tests",
+    )
