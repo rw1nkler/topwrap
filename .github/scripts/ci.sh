@@ -55,6 +55,12 @@ enter_venv() {
     end_command_group
 }
 
+install_tuttest() {
+    begin_command_group "Install tuttest"
+    log_cmd pip install git+https://github.com/antmicro/tuttest
+    end_command_group
+}
+
 install_topwrap() {
     begin_command_group "Install Topwrap"
     log_cmd "tuttest README.md | bash -"
@@ -102,9 +108,9 @@ run_tests() {
 
     begin_command_group "Install python packages for tests"
     log_cmd pip install ".[tests]"
-    log_cmd pip install git+https://github.com/antmicro/tuttest
     end_command_group
 
+    install_tuttest
     install_topwrap
 
     begin_command_group "Run Python tests"
@@ -119,10 +125,7 @@ generate_examples() {
     end_command_group
     enter_venv
 
-    begin_command_group "Install python packages for examples"
-    log_cmd pip install git+https://github.com/antmicro/tuttest
-    end_command_group
-
+    install_tuttest
     install_topwrap
 
     for EXAMPLE in "${EXAMPLES[@]}"; do
@@ -141,10 +144,7 @@ package_cores() {
     end_command_group
     enter_venv
 
-    begin_command_group "Install python packages for packaging cores"
-    log_cmd pip install git+https://github.com/antmicro/tuttest
-    end_command_group
-
+    install_tuttest
     install_topwrap
 
     begin_command_group "Install Topwrap's parsing dependencies"
@@ -186,9 +186,9 @@ package_dist() {
 
     begin_command_group "Install python packages needed for building and testing"
     log_cmd pip install ".[deploy,tests]"
-    log_cmd pip install git+https://github.com/antmicro/tuttest
     end_command_group
 
+    install_tuttest
     install_topwrap
 
     begin_command_group "Build packages"
