@@ -103,14 +103,9 @@ def build(session: nox.Session) -> None:
 # this exists separately in order to have a fresh venv without topwrap installed in development mode
 @nox.session
 def _install_test(session: nox.Session) -> None:
-    package_file = None
-    for f in os.listdir("./dist"):
-        if f.startswith("topwrap") and f.endswith("tar.gz"):
-            package_file = f
-            break
-
+    package_file = next(Path().glob("dist/topwrap*.tar.gz"), None)
     assert package_file is not None, "Cannot find source package in the dist/ directory"
-    session.install(f"./dist/{package_file}[tests,topwrap-parse]")
+    session.install(f"{package_file}[tests,topwrap-parse]")
 
     # paranoid assurance to not accidentally test local source
     CHANGED_NAME = "./shadow_topwrap"
