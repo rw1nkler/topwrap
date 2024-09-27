@@ -10,7 +10,7 @@ Topwrap’s most notable features are:
 * Capability to create a custom libraries for reuse across projects
 * User-friendly GUI:
 
-![GUI example](docs/source/img/pwm_design.png)
+![GUI example](docs/source/img/SoC-diagrams-with-Topwrap--sm-post-v4.mp4)
 
 ## Installation
 
